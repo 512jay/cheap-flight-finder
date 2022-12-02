@@ -12,38 +12,44 @@ class DataManager:
         self.tequila_api = os.environ.get("TEQUILA_API")
         self.tequila_header = dict(apikey=self.tequila_api, accept="application/json")
         self.cities = self.gather_cities_from_google_sheet()
+        self.check_iata_code()
 
     def get_iata_code(self, term):
+        """Given a term like a city it returns the IATA code"""
+
         parameters = dict(term=term, locale="en-US", location_types="airport", limit=1, active_only="true")
         response = requests.get(url=self.locations_query_url, headers=self.tequila_header, params=parameters)
         response.raise_for_status()
         iata = response.json()["locations"][0]["city"]["code"]
-        print(iata)
         return iata
 
-    def update_iata_code(self, term, sheet_id):
-        pass
+    def update_iata_code(self, term, sheet_id, iata):
+        """Updates the Google sheet with the IATA"""
+        print(f"Updating {term} on row {sheet_id} with {iata = }")
 
     def gather_cities_from_google_sheet(self):
+        """Returns a dictionary of cities along id and IATA (if available) from Google sheets"""
         response = requests.get(url=self.flight_deals_google_sheet_url, headers=self.sheety_header)
         response.raise_for_status()
         print(response.json())
         city_list = [response.json()["prices"]][0]
-        print(f"city list = {city_list}")
         return city_list
 
-    def check_ita_code(self, city_list):
-        for site in city_list:
+    def check_iata_code(self):
+        """Checks if the dictionary of cites all have IATA codes"""
+        for site in self.cities:
             city = site["city"]
             sheet_id = site['id']
-            print(city, sheet_id)
             try:
-                iata = site['iata']
-                print(site['iata'])
+                if len(site['iata']) != 3:
+                    print(f"{city} has an invalid IATA field attempting update")
+                    site['iata'] = self.get_iata_code(city)
             except KeyError:
-                print(f"{city} has no IATA info")
+                print(f"{city} has no IATA info attempting update")
                 site['iata'] = self.get_iata_code(city)
-                self.update_iata_code(city, sheet_id)
+                self.update_iata_code(city, sheet_id, site['iata'])
+            finally:
+                print(f"{city} has code {site['iata']}")
 
 
 test = DataManager()
