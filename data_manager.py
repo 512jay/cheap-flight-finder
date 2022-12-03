@@ -13,6 +13,7 @@ class DataManager:
         self.tequila_header = dict(apikey=self.tequila_api, accept="application/json")
         self.cities = self.gather_cities_from_google_sheet()
         self.check_iata_code()
+        self.load_destinations()
 
     def get_iata_code(self, term):
         """Given a term like a city it returns the IATA code"""
@@ -58,7 +59,8 @@ class DataManager:
             finally:
                 print(f"{city} has code {site['iata']}")
 
+    def load_destinations(self):
+        for destination in self.cities:
+            self.get_iata_code(destination)
 
-test = DataManager()
-for destination in test.cities:
-    test.get_iata_code(destination)
+
