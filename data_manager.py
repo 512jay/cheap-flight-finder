@@ -24,7 +24,7 @@ class DataManager:
         iata = response.json()["locations"][0]["city"]["code"]
         return iata
 
-    def update_iata_code(self, term, sheet_id, iata):
+    def update_iata_code(self, sheet_id, iata):
         """Updates the Google sheet with the IATA"""
         update_data = {
             "price": {
@@ -51,16 +51,14 @@ class DataManager:
                 if len(site['iata']) != 3:
                     print(f"{city} has an invalid IATA field attempting update")
                     site['iata'] = self.get_iata_code(city)
-                    self.update_iata_code(city, sheet_id, site['iata'])
+                    self.update_iata_code(sheet_id, site['iata'])
             except KeyError:
                 print(f"{city} has no IATA info attempting update")
                 site['iata'] = self.get_iata_code(city)
-                self.update_iata_code(city, sheet_id, site['iata'])
+                self.update_iata_code(sheet_id, site['iata'])
             finally:
                 print(f"{city} has code {site['iata']}")
 
     def load_destinations(self):
         for destination in self.cities:
             self.get_iata_code(destination)
-
-
