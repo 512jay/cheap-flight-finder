@@ -25,13 +25,19 @@ class DataManager:
 
     def update_iata_code(self, term, sheet_id, iata):
         """Updates the Google sheet with the IATA"""
-        print(f"Updating {term} on row {sheet_id} with {iata = }")
+        update_data = {
+            "price": {
+                "iata": iata
+            }
+        }
+        response = requests.put(url=f"{self.flight_deals_google_sheet_url}/{sheet_id}",
+                                headers=self.sheety_header, json=update_data)
+        response.raise_for_status()
 
     def gather_cities_from_google_sheet(self):
         """Returns a dictionary of cities along id and IATA (if available) from Google sheets"""
         response = requests.get(url=self.flight_deals_google_sheet_url, headers=self.sheety_header)
         response.raise_for_status()
-        print(response.json())
         city_list = [response.json()["prices"]][0]
         return city_list
 
@@ -44,6 +50,7 @@ class DataManager:
                 if len(site['iata']) != 3:
                     print(f"{city} has an invalid IATA field attempting update")
                     site['iata'] = self.get_iata_code(city)
+                    self.update_iata_code(city, sheet_id, site['iata'])
             except KeyError:
                 print(f"{city} has no IATA info attempting update")
                 site['iata'] = self.get_iata_code(city)
