@@ -38,7 +38,7 @@ class FlightSearch:
         return 9999999
 
 
-flight = FlightSearch()
-print(f"{flight.search('LON') = }")
-print(f"{flight.search('PAR') = }")
-print(f"{flight.search('HOU') = }")
+trip = FlightSearch()
+places = ["CUN", "LON", "ELP", "PAR", "NYC", "HOU"]
+for place in places:
+    print(f"{place} ${trip.search(place)['price']}")
