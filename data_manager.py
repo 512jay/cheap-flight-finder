@@ -14,6 +14,7 @@ class DataManager:
         self.cities = self.gather_cities_from_google_sheet()
         self.check_iata_code()
         self.load_destinations()
+        self.city_list = self.cities
 
     def get_iata_code(self, term):
         """Given a term like a city it returns the IATA code"""
@@ -56,9 +57,10 @@ class DataManager:
                 print(f"{city} has no IATA info attempting update")
                 site['iata'] = self.get_iata_code(city)
                 self.update_iata_code(sheet_id, site['iata'])
-            finally:
-                print(f"{city} has code {site['iata']}")
 
     def load_destinations(self):
         for destination in self.cities:
             self.get_iata_code(destination)
+
+    def get_list(self):
+        return self.city_list
