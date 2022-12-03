@@ -33,12 +33,5 @@ class FlightSearch:
                 if flight["price"] < lowest_price:
                     lowest_price = flight["price"]
                     cheapest_flight = flight
-            print(cheapest_flight["price"])
             return cheapest_flight
         return 9999999
-
-
-trip = FlightSearch()
-places = ["CUN", "LON", "ELP", "PAR", "NYC", "HOU"]
-for place in places:
-    print(f"{place} ${trip.search(place)['price']}")
